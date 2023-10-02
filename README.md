@@ -1,6 +1,10 @@
 # EducationalTool_BruteForce_PasswordCracker_PowerSet
 This is an educational tool that will help you understand how password-crackers work
 
+
+For easier reading, please navigate to the actual "readMe.md" file, and open it in "Code" view.
+
+
 /// <WARNING>
     /// I do not endorse illegal activity of any kind. I also do not wish to enable anyone to perform illegal activity. 
     ///     This tool is strictly for educational purposes. 
