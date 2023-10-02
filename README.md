@@ -2,7 +2,10 @@
 This is an educational tool that will help you understand how password-crackers work
 
 
-For easier reading, please navigate to the actual "readMe.md" file, and open it in "Code" view.
+
+** Note: For easier reading, please navigate to the actual "ReadMe.md" file, and open it in "Code" view.
+
+
 
 
 /// <WARNING>
