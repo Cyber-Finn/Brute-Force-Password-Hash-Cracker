@@ -26,7 +26,7 @@ The app can definitely be improved and made to be more efficient,  <br>
 but it is PURPOSELY designed to be user-UNfriendly and developer-UNfriendly to increase the difficulty of turning it into a cyber-weapon. <br>
 I also wrote this over a weekend, and will likely improve it at some point in the future - but may not release the improved version to public, for obvious reasons. <br>
  <br>
-** What you will come to understand from using this tool is: <br>
+### What you will come to understand from using this tool is:
 Having a long password (12 chars, for example) isn't enough Security, if you're only using the same 5 characters to create that password. <br>
 (You can test this by changing "passLength" to 12, and using 5 unique characters in the "chars" array, then inputting a random 12-character password in the Console, and seeing how long it takes to reverse-engineer) <br>
 You absolutely need to use longer passwords with more combinations of characters and symbols. <br>
