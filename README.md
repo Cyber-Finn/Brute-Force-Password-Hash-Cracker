@@ -1,5 +1,6 @@
 # EducationalTool_BruteForce_PasswordCracker_PowerSet
-This is an educational tool that will help you understand how password-crackers work
+This is an educational tool that will help you understand how password-crackers work  <br>
+This tool implements the Power Set algorithm to get all possible combinations of passwords, theoretically making it the most accurate - but least efficient - password cracker out there.  <br>
 
 
 ## Notes
