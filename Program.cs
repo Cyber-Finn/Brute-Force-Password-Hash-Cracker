@@ -1,71 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using MultiArrayTest.Utilities;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 internal class Program
 {
-
-    /// <WARNING>
-    /// I do not endorse illegal activity of any kind. I also do not wish to enable anyone to perform illegal activity. 
-    ///     This tool is strictly for educational purposes. 
-    ///         You assume ALL liability when using this tool for illegal activity, or when converting this tool into a cyber-weapon of ANY kind.
-    /// 
-    /// It is ILLEGAL to attempt to crack passwords that you do not own, as well as systems that you do not own.
-    /// </WARNING>
-
-    /// <SUMMARY>
-    /// This app is not intended to be used as a real-world brute-force password cracker, or "hacking tool" of any kind!
-    /// It's merely an educational tool, to help people understand that the entropy of a password increases with the size of the password, and how their passwords could be reverse-engineered - so that they are better able to defend themselves.
-    /// In that vein, using more characters and symbols will create a stronger password - which requires more combinations and iterations to crack.
-    ///     At some point, the password becomes almost impossible to crack using a tool like this (Because of current resource constraints), 
-    ///         And it'd then require a "slower" approach, which sacrifices speed for memory/resources efficiency,
-    ///             meaning that your password may STILL be vulnerable (Even if this tool can't crack it) over a longer period of time.
-    ///
-    ///                 
-    /// This application may also benefit anyone looking for an example of: How to implement the mathematical "Power Set" algorithm - to get ALL possible combinations of a given series of characters/numbers/symbols, although it does slightly differ because of the use-case.
-    ///     This also means that the tool is able to - theoretically - crack ANY "password" with 100% accuracy, because it gets ALL possible combinations, 
-    ///         but the tool is bound by modern computing resource-constraints,
-    ///             because the Power Set becomes exponentially massive as the length of the "password" increases - and computers have only finite memory to use.
-    /// 
-    ///     The app can definitely be improved and made to be more efficient, 
-    ///         but it is PURPOSELY designed to be user-UNfriendly and developer-UNfriendly to increase the difficulty of turning it into a cyber-weapon.
-    ///             I also wrote this over a weekend, and will likely improve it at some point in the future - but may not release the improved version to public, for obvious reasons.
-    /// </SUMMARY>
-
-    ///<HOW_THE_APP_WORKS>
-    /// Basically:
-    ///     When started, the app will specify some parameters for you to work within.
-    ///     When you input a random "password", the app will generate a hash for the "password", and then try to reverse-engineer that hash (Which should be impossible, because of how hashing works)
-    /// </HOW_THE_APP_WORKS>
-
-    ///<USAGE_INSTRUCTIONS>
-    /// You can change the characters that the app needs to iterate over by changing the values of the "chars" array
-    /// You can change how many characters the "password" needs to be, by editing the value of"passLength"
-    /// 
-    /// Note that, because this app finds every possible combination for the given set - up to the number of passlength - the output data set will be exponentially massive with each value increment of 1 for the "passlength".
-    ///     so basically, the complexity of this application is akin to n^n -> where n = the number of characters to use to generate the resultant data set ( "lengthOfCharsArr")
-    ///     this means that a 6 char "password", using 91 characters - to reverse-engineer, could use upwards of 40GB of host RAM.
-    ///         *** Please exercise extreme caution when changing the values of "chars[]" and "passlength" ***
-    /// </USAGE_INSTRUCTIONS>
- 
-    ///<Additional_Info>
-    /// Hackers/"Malicious Actors"/"Threat actors" may sometimes manage to compromise a database of stored password hashes
-    ///     (This isn't uncommon - since most passwords aren't stored in "plain English", but rather stored as hashes [Which are meant to be impossible to reverse-engineer - because hashing is a one-wayfunction])
-    ///     The attacker would then use a tool like this, a rainbow-table or some other hybrid-tool, to attempt to reverse engineer that hash.
-    ///     They could also use cyber-weapons similar this, to automatically send hundreds-of-thousands of login-attempts to a server (With your username), to "guess" the password and gain access.
-    ///         This is why "Lockout counts" (Although annoying) are so important! They would effectively prevent the hacker from logging into your account, by locking your account after a few failed login attempts
-    ///             But these could also be exploited to cause Denial Of Service (DOS) attacks, to prevent you (The user) from using a specific service.
-    /// </Additional_Info>
-
-
-
-
-
-    //private static readonly char[] chars = new char[91]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0','`','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','<','>','/','\\','\'','"','[',']',',','.',' ',';'};
+    private static readonly string[] hashingAlgs = new string[2] { "SHA256", "MD5" };
+    private static readonly char[] chars = new char[91]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0','`','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','<','>','/','\\','\'','"','[',']',',','.',' ',';'};
     //private static readonly char[] chars = new char[15]{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' };
-    private static readonly char[] chars = new char[5] { 'a', 'b', 'c', 'd', 'e'};
+    //private static readonly char[] chars = new char[5] { 'a', 'b', 'c', 'd', 'e'};
     //private static readonly char[] chars = new char[3] { 'a', 'b', 'c' };
     private static int lengthOfCharsArr = chars.Length;
-    private static int passLength = 6;
+    private static int passLength = 3;
+    private static string hashToUse = "";
+
     private static List<List<List<string>>> ListOfListsOfLists_AllPossibleCombs_ForThisManyPasswordChars_forSingleCharacter = new List<List<List<string>>>();
     private static string userInputHash = "";
     private static string autoGeneratedInputThatGaveUsOurHash = "";
@@ -73,7 +21,7 @@ internal class Program
     {
         //clear up all variables
         clearAllVariables();
-        //save our user's input -> this will also gen an MD5 hash for their "password"
+        //save our user's input -> this will also gen a (SHA256 or MD5, for now) hash for their password
         loadUpUserInput();
         //controller method -> will handle creating all the power sets and comparing the hashes to user input "password" hash
         Controller();
@@ -82,23 +30,6 @@ internal class Program
         //clear up all variables
         clearAllVariables();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private static void clearAllVariables()
@@ -114,28 +45,79 @@ internal class Program
 
     private static void loadUpUserInput()
     {
-        string str= "";
+        hashToUse = getUserSelectedHashAlgorithm();
+        getUserPasswordText();
+    }
+
+    private static string getUserSelectedHashAlgorithm()
+    {
+        string str = "";
+        int hashAlgsCount = hashingAlgs.Count();
+        int hashAlgsCountMin1 = hashingAlgs.Count() - 1;
+
+        for(int i = 0; i < hashAlgsCountMin1; i++)
+        {
+            str += hashingAlgs[i] + ", ";
+        }
+        str += hashingAlgs[hashAlgsCountMin1];
+
+        Console.WriteLine($"The currently available hash algorithms are: {str}.\r\nYou have {hashAlgsCount} options to choose from. Please select a number between 1 and {hashAlgsCount}");
+
+        string? s = Console.ReadLine();
+        //generate an MD5 hash for the password (MD5 here is arb, we could also use SHA256, in exactly the same way etc.)
+
+        //todo: rework this to be more modular and dynamic as we add more options
+        if (s != null)
+        {
+            if(s.Equals("1"))
+            {
+                s = "SHA256";
+            }
+            if (s.Equals("2"))
+            {
+                s = "MD5";
+            }
+        }
+        Console.WriteLine($"Selected hashing algorithm: {s}");
+        return s;
+    }
+
+    private static void getUserPasswordText()
+    {
+        string str = "";
         foreach (char c in chars)
         {
-            str += c+", ";
+            str += c + ", ";
         }
-        Console.WriteLine("Password Length is currently set to: {0}\r\n*Please use a TOTAL of {0} chars for the password*\r\nThese are the characters that you can use to create a password:\r\n{1}", passLength, str);
+        Console.WriteLine($"These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n{str}");
         Console.WriteLine("Please enter a password:");
 
         string? s = Console.ReadLine();
-        userInputHash = getMD5ForUserInput(s);
+
+        //todo: as mentioned in getUserSelectedHashAlg, we need to make this more modular in future
+        if (hashToUse.Equals(hashingAlgs[0]))
+        {
+            //generate a SHA256 hash for the password
+            userInputHash = SHA256Generator.ComputeSHA256Hash(s);
+        }
+        if (hashToUse.Equals(hashingAlgs[1]))
+        {
+            //generate an MD5 hash for the password
+            userInputHash = getMD5ForUserInput(s);
+        }
+        Console.WriteLine($"Hash of password \"{s}\" was: {userInputHash}");
     }
 
     private static void writeOutPut()
     {
-        Console.WriteLine("User password was: " + autoGeneratedInputThatGaveUsOurHash);
+        Console.WriteLine($"The User's password was: {autoGeneratedInputThatGaveUsOurHash}");
     }
 
     private static void Controller()
     {
         //load up all the required characters
         intialLoadupOfOurFistCharList();
-        //test each combination
+        //test each combination until we get the original
         dataAccessor();
     }
 
@@ -162,20 +144,107 @@ internal class Program
                     //stop exec if we already have an answer
                     if (continueExecution)
                     {
-                        //pass the list to the MD5 function
-                        continueExecution = getMd5_StagingMethod(ListOfListsOfLists_AllPossibleCombs_ForThisManyPasswordChars_forSingleCharacter[i][j]);
+                        List<string> currList = ListOfListsOfLists_AllPossibleCombs_ForThisManyPasswordChars_forSingleCharacter[i][j];
+
+                        //todo: as mentioned in getUserSelectedHashAlg, we need to make this more modular in future
+                        if (hashToUse.Equals(hashingAlgs[0]))
+                        {
+                            //pass the list to the MD5 function
+                            continueExecution = getSha256_StagingMethod(ref currList);
+                        }
+                        if (hashToUse.Equals(hashingAlgs[1]))
+                        {
+                            //pass the list to the MD5 function
+                            continueExecution = getMd5_StagingMethod(ref currList);
+                        }
                     }
                 }
             }
         }
     }
 
+    private static bool getSha256_StagingMethod(ref List<string> list)
+    {
+        bool continueExecution = true;
+        List<string> newList = new List<string>();
+
+        //foreach element in the list
+        foreach (string autoGeneratedListItem in list)
+        {
+            //we want to now add a new char to the end of the element array
+            for (int j = 0; j < lengthOfCharsArr; j++)
+            {
+                //stop exec if we already have an answer
+                if (continueExecution)
+                {
+                    //create a temp string
+                    string s = "";
+                    //convert each str to a char[]
+                    char[] carr = autoGeneratedListItem.ToCharArray();
+                    int lengOfTempArr = ((carr.Length)); // Min1, because it needs to be 0-based index
+
+                    if (lengOfTempArr < passLength)
+                    {
+                        //add each element to the new string
+                        for (int i = 0; i < lengOfTempArr; i++)
+                        {
+                            s += carr[i];
+                        }
+                        //add a new char to the string
+                        s += chars[j];
+                        //add our newly replaced character to the new list
+                        newList.Add(s);
+                    }
+                }
+            }
+            if (newList.Count > 0)
+            {
+                continueExecution = getSHA256ForGeneratedInput(ref newList);
+                newList.Clear();
+                newList.TrimExcess();
+            }
+        }
+        //if we still don't have an answer - likely because newList+newChar didn't equal passleng
+        if (continueExecution)
+        {
+            continueExecution = getSHA256ForGeneratedInput(ref list);
+        }
+        return continueExecution;
+    }
+
+    private static bool getSHA256ForGeneratedInput(ref List<string> list)
+    {
+        string strInputThatMatchedTheHash = "";
+        //for every item in the list
+        foreach (string autoGeneratedListItem in list)
+        {
+            //only do stuff if our input is empty. No point asking a question if we already have an answer.
+            if (strInputThatMatchedTheHash.Equals(""))
+            {
+                string hashForThisInputStr = SHA256Generator.ComputeSHA256Hash(autoGeneratedListItem);
+
+                //do the check after our md5 object is destroyed - to not keep it in memory unnecessarily
+                //if the hash matches to what the user inputted, set our input to the string we've found to match the hash
+                if (CompareHashes(hashForThisInputStr))
+                {
+                    strInputThatMatchedTheHash = autoGeneratedListItem;
+                    break;
+                }
+            }
+        }
+        //save the input that gave us the hash we wanted
+        autoGeneratedInputThatGaveUsOurHash = strInputThatMatchedTheHash;
+        //if we have an answer, we want to stop execution.
+        return (strInputThatMatchedTheHash.Equals(""));
+    }
+
+
     /// <summary>
     /// This method will call the md5 function, and iterate through all possible combs
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
-    private static bool getMd5_StagingMethod(List<string> list)
+    private static bool getMd5_StagingMethod(ref List<string> list)
     {
         bool continueExecution = true;
         List<string> newList = new List<string>();
@@ -211,7 +280,7 @@ internal class Program
             }
             if(newList.Count>0)
             {
-                continueExecution = getMD5ForGeneratedInput(newList);
+                continueExecution = getMD5ForGeneratedInput(ref newList);
                 newList.Clear();
                 newList.TrimExcess();
             }
@@ -219,7 +288,7 @@ internal class Program
         //if we still don't have an answer - likely because newList+newChar didn't equal passleng
         if (continueExecution)
         {
-            continueExecution = getMD5ForGeneratedInput(list);
+            continueExecution = getMD5ForGeneratedInput(ref list);
         }
         return continueExecution;
     }
@@ -229,7 +298,7 @@ internal class Program
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
-    private static bool getMD5ForGeneratedInput(List<string> list)
+    private static bool getMD5ForGeneratedInput(ref List<string> list)
     {
         string strInputThatMatchedTheHash = "";
         //for every item in the list
@@ -253,6 +322,7 @@ internal class Program
                 if (CompareHashes(hashForThisInputStr))
                 {
                     strInputThatMatchedTheHash = autoGeneratedListItem;
+                    break;
                 }
             }
         }
@@ -290,45 +360,56 @@ internal class Program
     private static void intialLoadupOfOurFistCharList() 
     {
         //we only want to do this if the req no. of password chars is 1 or higher
-        if (passLength >= 1)
+        if (passLength < 1)
         {
-            //create a list to hold our data
-            List<string> baseStringList_InitialChars = new List<string>();
-            // for every char in the chars[]
-            for (int i = 0; i < lengthOfCharsArr; i++)
-            {
-                //create a temp string to hold our character
-                string s = "";
-                s += chars[i];
-                //add our string (of a single char) to the list
-                baseStringList_InitialChars.Add(s);
-            }
+            return;
+        }
 
-            // we only want to get all power sets if the password length is greater than 1 (-> else: we only generate and compare 1 char)
-            if (passLength > 1)
+        //create a list to hold our data
+        List<string> baseStringList_InitialChars = new List<string>();
+        // for every char in the chars[]
+        for (int i = 0; i < lengthOfCharsArr; i++)
+        {
+            //add our string (of a single char) to the list
+            baseStringList_InitialChars.Add(chars[i].ToString());
+        }
+
+        /// Note: we only want to get all power sets if the password length is greater than 1 (else, we only generate and compare 1 char)
+        if (passLength > 1)
+        {
+            int remainingPassLength = passLength - 1;
+            int count = baseStringList_InitialChars.Count;
+            secondLoadupAttempt(ref baseStringList_InitialChars, ref count, ref remainingPassLength);
+        }
+        //Here, we want to compare the hash of single char to the input hash.. (since, at this point, we only have a single char)
+        else if (passLength == 1)
+        {
+            foreach (string s in baseStringList_InitialChars)
             {
-                int count = baseStringList_InitialChars.Count;
-                secondLoadupAttempt(baseStringList_InitialChars, count, passLength - 1);
-            }
-            else if (passLength == 1)
-            {
-                //here, we want to compare the hash of single char to the input hash.. (since, at this point, we only have a single char)
-                //Note: I could break this out into a separate method, but the storage implications of repeatedly copying and creating Lists<> could be too high (and we're already doing this quite a lot in the other methods..)
-                    //because of the (unfortunately) badly optimized power set algorithm (Which nobody taught me to do in code, and I didn't have examples to follow along with), and current computing limitations, we should save space where we can -> this is one of those opportunities :)
-                foreach (string s in baseStringList_InitialChars)
+                //execute only if we don't already have an answer
+                if(autoGeneratedInputThatGaveUsOurHash.Equals(""))
                 {
-                    //execute only if we don't already have an answer
-                    if(autoGeneratedInputThatGaveUsOurHash.Equals(""))
+                    //todo: as mentioned in getUserSelectedHashAlg, we need to make this more modular in future
+                    if (hashToUse.Equals(hashingAlgs[0]))
+                    {
+                        //reuse the same method we had earlier to get a hash for a single string (This method will prod a hash for a single char)
+                        if (CompareHashes(SHA256Generator.ComputeSHA256Hash(s)))
+                        {
+                            autoGeneratedInputThatGaveUsOurHash = s;
+                        }
+                    }
+                    if (hashToUse.Equals(hashingAlgs[1]))
                     {
                         //reuse the same method we had earlier to get a hash for a single string (This method will prod a hash for a single char)
                         if (CompareHashes(getMD5ForUserInput(s)))
                         {
                             autoGeneratedInputThatGaveUsOurHash = s;
                         }
-                    }
+                    }                    
                 }
             }
         }
+        
     }
 
     /// <summary>
@@ -341,7 +422,7 @@ internal class Program
     /// <param name="previousList"></param>
     /// <param name="countOfPreviousList"></param>
     /// <param name="noOfIterationsLeft"></param>
-    private static void secondLoadupAttempt(List<string> previousList, int countOfPreviousList, int noOfIterationsLeft)
+    private static void secondLoadupAttempt(ref List<string> previousList, ref int countOfPreviousList, ref int noOfIterationsLeft)
     {
         //we only want to iterate over chars and do stuff, if we need to (-> if there's another letter for us to try to get)
         if(noOfIterationsLeft >= 1)
@@ -379,7 +460,7 @@ internal class Program
                 //calculate the no of elements of the current list
                 int countOfCurrList = listOfAllPossibleCombs.Count;
                 //call the recursive method to continue with the rest of the numbers, until there's no letters left to get
-                recurseAddBaseStringVariationsToLists(listOfAllPossibleCombs, countOfCurrList, noOfIterationsLeft);
+                recurseAddBaseStringVariationsToLists(ref listOfAllPossibleCombs, ref countOfCurrList, ref noOfIterationsLeft);
             }
             //else, we just save what we currently have
             else if (noOfIterationsLeft == 0)
@@ -394,7 +475,7 @@ internal class Program
     /// <param name="ListOfList_previousCombinationsList"></param>
     /// <param name="countOfPreviousList"></param>
     /// <param name="noOfIterationsLeft"></param>
-    private static void recurseAddBaseStringVariationsToLists(List<List<string>> ListOfList_previousCombinationsList, int countOfPreviousList, int noOfIterationsLeft)
+    private static void recurseAddBaseStringVariationsToLists(ref List<List<string>> ListOfList_previousCombinationsList, ref int countOfPreviousList, ref int noOfIterationsLeft)
     {
         if (noOfIterationsLeft >= 1)
         {
@@ -428,6 +509,11 @@ internal class Program
                     listOfAllPossibleCombs.Add(strList);
                 }
             }
+
+            //clear the previous stack's list
+            //ListOfList_previousCombinationsList = null;
+            ClearMemory(ref ListOfList_previousCombinationsList);
+
             //decrease the noOfIterationsLeft, because we don't want to go to next phase, if we already have the max chars
             noOfIterationsLeft--;
 
@@ -437,7 +523,7 @@ internal class Program
                 //get the no of elements of the current list
                 int countOfCurrList = listOfAllPossibleCombs.Count;
                 //call the recursive method to continue with the rest of the numbers
-                recurseAddBaseStringVariationsToLists(listOfAllPossibleCombs, countOfCurrList, noOfIterationsLeft);
+                recurseAddBaseStringVariationsToLists(ref listOfAllPossibleCombs, ref countOfCurrList, ref noOfIterationsLeft);
             }
 
             //only on the LAST run/iteration, we want to save the data to a global variable, so that we can access it from other parts of our program
@@ -447,5 +533,15 @@ internal class Program
                 ListOfListsOfLists_AllPossibleCombs_ForThisManyPasswordChars_forSingleCharacter.Add(listOfAllPossibleCombs);
             }
         }
+    }
+
+    public static void ClearMemory<T>(ref List<T> list)
+    {
+        int generation = GC.GetGeneration(list);
+        list.Clear();
+        GC.Collect(generation, GCCollectionMode.Forced);
+
+        //could also set the list to null to uproot the object and let GC manage itself
+        //list = null;
     }
 }
