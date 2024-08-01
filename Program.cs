@@ -5,13 +5,14 @@ using System.Security.Cryptography;
 
 internal class Program
 {
+    private static readonly string systemPrefix = "[SYSTEM]";
     private static readonly string[] hashingAlgs = new string[2] { "SHA256", "MD5" };
     private static readonly char[] chars = new char[91]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0','`','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','<','>','/','\\','\'','"','[',']',',','.',' ',';'};
     //private static readonly char[] chars = new char[15]{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' };
     //private static readonly char[] chars = new char[5] { 'a', 'b', 'c', 'd', 'e'};
     //private static readonly char[] chars = new char[3] { 'a', 'b', 'c' };
     private static int lengthOfCharsArr = chars.Length;
-    private static int passLength = 3;
+    private static int passLength = 0;
     private static string hashToUse = "";
 
     private static List<List<List<string>>> ListOfListsOfLists_AllPossibleCombs_ForThisManyPasswordChars_forSingleCharacter = new List<List<List<string>>>();
@@ -45,8 +46,36 @@ internal class Program
 
     private static void loadUpUserInput()
     {
+        passLength = getUserDesiredPassLength();
         hashToUse = getUserSelectedHashAlgorithm();
         getUserPasswordText();
+    }
+
+    private static int getUserDesiredPassLength()
+    {
+        Console.WriteLine($"{systemPrefix} Please insert the length of the password you want to crack (example: 3) \r\n{systemPrefix} Note: The longer the password is, the more time it will take to crack.");
+        int finalAns = getuserPassLengInput();
+
+        return finalAns;
+    }
+    private static int getuserPassLengInput()
+    {
+        string? strRep = Console.ReadLine();
+        int finalAns = 0;
+        try
+        {
+            if (!String.IsNullOrEmpty(strRep))
+            {
+                //we're just going to assume that the user gave an actual number >= 1
+                return int.Parse(strRep);
+            }
+            getuserPassLengInput();
+        }
+        catch
+        {
+            getuserPassLengInput();
+        }
+        return finalAns;
     }
 
     private static string getUserSelectedHashAlgorithm()
@@ -61,24 +90,35 @@ internal class Program
         }
         str += hashingAlgs[hashAlgsCountMin1];
 
-        Console.WriteLine($"The currently available hash algorithms are: {str}.\r\nYou have {hashAlgsCount} options to choose from. Please select a number between 1 and {hashAlgsCount}");
 
+        Console.WriteLine($"{systemPrefix} The currently available hash algorithms are: {str}.\r\n{systemPrefix} You have {hashAlgsCount} options to choose from. Please select a number between 1 and {hashAlgsCount}");
+
+        string? s = getuserAlgInput();
+        Console.WriteLine($"{systemPrefix} Selected hashing algorithm: {s}");
+
+        return s;
+    }
+
+
+    private static string? getuserAlgInput()
+    {
         string? s = Console.ReadLine();
         //generate an MD5 hash for the password (MD5 here is arb, we could also use SHA256, in exactly the same way etc.)
 
-        //todo: rework this to be more modular and dynamic as we add more options
-        if (s != null)
+        try
         {
-            if(s.Equals("1"))
+            if (!String.IsNullOrEmpty(s))
             {
-                s = "SHA256";
+                //we're just going to assume that the user gave an actual number >= 1
+                s = hashingAlgs[int.Parse(s)-1];
+                return s;
             }
-            if (s.Equals("2"))
-            {
-                s = "MD5";
-            }
+            getuserAlgInput();
         }
-        Console.WriteLine($"Selected hashing algorithm: {s}");
+        catch
+        {
+            getuserAlgInput();
+        }
         return s;
     }
 
@@ -89,8 +129,8 @@ internal class Program
         {
             str += c + ", ";
         }
-        Console.WriteLine($"These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n{str}");
-        Console.WriteLine("Please enter a password:");
+        Console.WriteLine($"{systemPrefix} These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n{str}");
+        Console.WriteLine($"{systemPrefix} Please enter a password:");
 
         string? s = Console.ReadLine();
 
@@ -105,12 +145,12 @@ internal class Program
             //generate an MD5 hash for the password
             userInputHash = getMD5ForUserInput(s);
         }
-        Console.WriteLine($"Hash of password \"{s}\" was: {userInputHash}");
+        Console.WriteLine($"{systemPrefix} Hash of password \"{s}\" was: {userInputHash}");
     }
 
     private static void writeOutPut()
     {
-        Console.WriteLine($"The User's password was: {autoGeneratedInputThatGaveUsOurHash}");
+        Console.WriteLine($"{systemPrefix} The User's password was: {autoGeneratedInputThatGaveUsOurHash}");
     }
 
     private static void Controller()
