@@ -35,7 +35,7 @@ You should also avoid using the same passwords for different sites/systems. <br>
 When started, the app will specify some parameters for you to work within. <br>
 When you input a random "password", the app will generate a hash for the "password", and then try to reverse-engineer that hash (Which should be impossible, because of how hashing works) 
 <br>
-Note: For smaller passwords (1~3 characters), because of the speedy reply, it's easy to believe that the app is just telling you what your password was without any calculation needed, but a quick read through the code should dispell any of those doubts
+Note: For smaller passwords (1~3 characters), because of the speedy reply, it's easy to believe that the app is just telling you what your password was without any calculation needed, but a quick read through the code should dispel any of those doubts
  <br>
  <br>
 ## Some Additional Info on Hackers and Common Tactics:
