@@ -7,10 +7,13 @@ internal class Program
 {
     private static readonly string systemPrefix = "[SYSTEM]";
     private static readonly string[] hashingAlgs = new string[2] { "SHA256", "MD5" };
-    private static readonly char[] chars = new char[91]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0','`','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','<','>','/','\\','\'','"','[',']',',','.',' ',';'};
-    //private static readonly char[] chars = new char[15]{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' };
-    //private static readonly char[] chars = new char[5] { 'a', 'b', 'c', 'd', 'e'};
+    private static readonly char[] charsExtended = new char[91]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0','`','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','<','>','/','\\','\'','"','[',']',',','.',' ',';'};
+    private static readonly char[] charsLong = new char[15] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' };
+    private static readonly char[] charsMedium = new char[5] { 'a', 'b', 'c', 'd', 'e' };
+    private static readonly char[] charsShort = new char[3] { 'a', 'b', 'c' };
+    private static readonly List<char[]> TotalChars = new List<char[]>() {charsShort, charsMedium, charsLong, charsExtended};
     //private static readonly char[] chars = new char[3] { 'a', 'b', 'c' };
+    private static readonly char[] chars = GetUserSelectedCharsArray();
     private static int lengthOfCharsArr = chars.Length;
     private static int passLength = 0;
     private static string hashToUse = "";
@@ -48,6 +51,37 @@ internal class Program
 
         passLength = getUserDesiredPassLength();
         getUserPasswordText();
+    }
+    private static char[] GetUserSelectedCharsArray()
+    {
+        Console.WriteLine($"{systemPrefix} Please choose a set of characters to use for reverse-engineering. \r\n{systemPrefix} There are currently {TotalChars.Count} sets to choose from. Pick a number between 1 and {TotalChars.Count}. " +
+                          $"\r\n{systemPrefix} Please note: The more characters we use, the higher the resource costs of reverse-engineering will be." +
+                          $"{systemPrefix} These are the currently available options: ");
+        int leng = TotalChars.Count;
+        for(int i = 0; i < leng; i++)
+        {
+            Console.WriteLine($"Set {i+1}. Number of characters: {TotalChars[i].Length}");
+        }
+        Console.WriteLine($"{systemPrefix} Please enter your selection:");
+
+        return TotalChars[LoadUserSelectedCharsArray()];
+    }
+    private static int LoadUserSelectedCharsArray()
+    {
+        string? strRep = Console.ReadLine();
+        try
+        {
+            if (!String.IsNullOrEmpty(strRep))
+            {
+                return (int.Parse(strRep)-1);
+            }
+            LoadUserPredefinedHashInput();
+        }
+        catch
+        {
+            LoadUserPredefinedHashInput();
+        }
+        return 0;
     }
     private static bool HandleUserAlreadyHasHashToCalc()
     {
@@ -232,7 +266,7 @@ internal class Program
         {
             str += c + ", ";
         }
-        Console.WriteLine($"{systemPrefix} These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n{str}");
+        Console.WriteLine($"{systemPrefix} These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n[ {str} ]");
         Console.WriteLine($"{systemPrefix} Please enter a password:");
 
         string? s = Console.ReadLine();
@@ -248,7 +282,7 @@ internal class Program
             //generate an MD5 hash for the password
             userInputHash = getMD5ForUserInput(s);
         }
-        Console.WriteLine($"{systemPrefix} Hash of password \"{s}\" was: {userInputHash}");
+        Console.WriteLine($"{systemPrefix} Hash of password \"{s}\" was: {userInputHash}. \r\n{systemPrefix} Reverse-engineering password hash..");
     }
     private static void writeOutPut()
     {
@@ -373,7 +407,11 @@ internal class Program
         //if we have an answer, we want to stop execution.
         return (strInputThatMatchedTheHash.Equals(""));
     }
-    //simply get a hash for the combo a user has inputted
+    /// <summary>
+    /// get a hash for the input
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns>Hex representation MD5 of the input</returns>
     private static string getMD5ForUserInput(string s)
     {
         string st = "";
