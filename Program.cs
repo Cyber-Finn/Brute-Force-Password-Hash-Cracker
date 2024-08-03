@@ -264,6 +264,11 @@ internal class Program
         string str = "";
         foreach (char c in chars)
         {
+            if (c == chars[chars.Length - 1])
+            {
+                str += "and " + c;
+                continue;
+            }
             str += c + ", ";
         }
         Console.WriteLine($"{systemPrefix} These are the {str.Length} characters that you can use to create a {passLength} character-long password:\r\n[ {str} ]");
