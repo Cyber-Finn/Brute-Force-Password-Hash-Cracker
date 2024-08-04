@@ -13,7 +13,8 @@ internal class Program
     private static readonly char[] charsLong = new char[15] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' };
     private static readonly char[] charsMedium = new char[5] { 'a', 'b', 'c', 'd', 'e' };
     private static readonly char[] charsShort = new char[3] { 'a', 'b', 'c' };
-    private static readonly List<char[]> TotalChars = new List<char[]>() {charsShort, charsMedium, charsLong, charsExtended};
+    private static readonly List<char[]> TotalChars = new List<char[]>() { charsShort, charsMedium, charsLong, charsExtended };
+    private static readonly Dictionary<char[], string> descriptionOfCharSets = new Dictionary<char[], string>() {{charsShort, "English Characters, A-C"}, { charsMedium , "English Characters, A-E"}, {charsLong, "English Characters, A-O"}, {charsExtended, "English Characters, A-Z, with extra symbols" } };
     private static readonly char[] chars = GetUserSelectedCharsArray();
     private static readonly int lengthOfCharsArr = chars.Length;
     #endregion readonly variables
@@ -87,7 +88,7 @@ internal class Program
         int leng = TotalChars.Count;
         for(int i = 0; i < leng; i++)
         {
-            Console.WriteLine($"Set {i+1}. Number of characters: {TotalChars[i].Length}");
+            Console.WriteLine($"Set {i+1}. Number of characters: {TotalChars[i].Length}. Description: {descriptionOfCharSets[TotalChars[i]]}");
         }
         Console.WriteLine($"{systemPrefix} Please enter your selection:");
 
