@@ -115,13 +115,12 @@ internal class Program
             {
                 return (int.Parse(strRep)-1);
             }
-            LoadUserPredefinedHashInput();
+            return LoadUserSelectedCharsArray();
         }
         catch
         {
-            LoadUserPredefinedHashInput();
+            return 0;
         }
-        return 0;
     }
     private static bool HandleUserAlreadyHasHashToCalc()
     {
@@ -163,13 +162,12 @@ internal class Program
             {
                 return int.Parse(strRep);
             }
-            LoadUserUpperLimitOfChars();
+            return LoadUserUpperLimitOfChars();
         }
         catch
         {
-            LoadUserUpperLimitOfChars();
+            return 0;
         }
-        return 0;
     }
     private static string GetuserPredefinedPwordHash()
     {
@@ -185,26 +183,25 @@ internal class Program
         {
             if (!String.IsNullOrEmpty(strRep))
             {
-                return strRep;
+                return strRep.ToLower(); //some places use a hash that has uppercase characters, it's meant to be lowercase lol
             }
-            LoadUserPredefinedHashInput();
+            return LoadUserPredefinedHashInput();
         }
         catch
         {
-            LoadUserPredefinedHashInput();
+            return string.Empty;
         }
-        return string.Empty;
     }
     private static bool CheckIfUserPredefinedPwordHash()
     {
         Console.WriteLine($"{systemPrefix} Do you already have a Hex-representation {hashToUse} Hash to reverse-engineer? \r\n{systemPrefix} Note: Please answer (Y/N) only");
-        bool finalAns = false; 
-        UserHasPredefinedHashInput(out finalAns);
+        bool finalAns = UserHasPredefinedHashInput();
 
         return finalAns;
     }
-    private static void UserHasPredefinedHashInput(out bool finalAns)
+    private static bool UserHasPredefinedHashInput()
     {
+        bool finalAns = false;
         string? strRep = Console.ReadLine();
         try
         {
@@ -213,23 +210,19 @@ internal class Program
                 if (strRep.Equals("Y"))
                 {
                     finalAns = true;
-                    return;
+                    return finalAns;
                 }
                 else if (strRep.Equals("N"))
                 {
                     finalAns = false;
-                    return;
-                }
-                else
-                {
-                    UserHasPredefinedHashInput(out finalAns);
+                    return finalAns;
                 }
             }
-            UserHasPredefinedHashInput(out finalAns);
+            return UserHasPredefinedHashInput();
         }
         catch
         {
-            UserHasPredefinedHashInput(out finalAns);
+            return false;
         }
     }
     private static int GetUserDesiredPassLength()
@@ -242,7 +235,6 @@ internal class Program
     private static int LoadUserPassLengInput()
     {
         string? strRep = Console.ReadLine();
-        int finalAns = 0;
         try
         {
             if (!String.IsNullOrEmpty(strRep))
@@ -250,13 +242,12 @@ internal class Program
                 //we're just going to assume that the user gave an actual number >= 1
                 return int.Parse(strRep);
             }
-            LoadUserPassLengInput();
+            return LoadUserPassLengInput();
         }
         catch
         {
-            LoadUserPassLengInput();
+            return 0;
         }
-        return finalAns;
     }
     private static string GetUserSelectedHashAlgorithm()
     {
@@ -291,13 +282,12 @@ internal class Program
                 s = hashingAlgs[int.Parse(s)-1];
                 return s;
             }
-            LoadUserSelectedHashAlgorithm();
+            return LoadUserSelectedHashAlgorithm();
         }
         catch
         {
-            LoadUserSelectedHashAlgorithm();
+            return "";
         }
-        return s;
     }
     private static void LoadUserPasswordText()
     {
